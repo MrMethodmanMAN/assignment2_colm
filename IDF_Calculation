@@ -1,0 +1,159 @@
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.StringTokenizer;
+
+
+public class IDF_Calculation 
+{
+	static String d1 = "Shipment of gold damaged in a fire"; 
+	static String d2 = "Delivery of silver arrived in a silver truck"; 
+	static String d3 = "Shipment of gold arrived in truck";
+
+	static String Q1 = "gold silver truck"; 
+	
+	static HashMap<String, Double> dictionary = new HashMap<String, Double>();
+	
+	 
+
+	public static void main(String args[])
+	{
+		calculateTotalValue();
+		String[] textArray= StringToArray(d3);	
+		String[] queryArray = StringToArray(Q1);
+		//System.out.println(Arrays.toString(array));		
+		
+		double[] valueArray = getStringValue(textArray);
+		double[] valueQueryArray = getStringValue(queryArray);
+		
+		calculateCosineDifference(textArray, queryArray, valueArray, valueQueryArray);
+		
+		
+		/*
+		 * Determine the cosine of a query		 
+		 */
+	
+	}	
+	
+	
+	public static String[] addStringToArray(String d1)
+	{
+		StringTokenizer st = new StringTokenizer(d1);
+		String[] d1array = new String[st.countTokens()];
+		int i = 0; 
+		while(st.hasMoreTokens())
+		{
+			
+			//System.out.println(st.nextToken());
+			d1array[i] = st.nextToken();
+			i++;			
+		}
+		//
+		return d1array;
+	}
+	
+	public static void addToDictionary(String d)
+	{
+		String[] Array;
+		Array = addStringToArray(d); 
+		
+		for(String a : Array)
+		{
+			if(!dictionary.containsKey(a))
+			{
+				dictionary.put(a, 1.0);
+			} 
+			else if(dictionary.containsKey(a))
+	 		{
+				dictionary.put(a, (dictionary.get(a)+ 1));
+			}
+		}
+		//System.out.println(dictionary.toString());
+	}
+	
+	public static void calculateTotalValue()
+	{
+		addToDictionary(d1);
+		addToDictionary(d2);
+		addToDictionary(d3);
+		double test =  Math.log(3.0/3.0);
+		//System.out.println(test);
+		
+		//iterating over values only
+		Double value = 0.0;
+		for(String s : dictionary.keySet())
+		{
+			//System.out.println("Value = " + s);
+			value = dictionary.get(s);
+			value = Math.log(3.0/value);
+			dictionary.put(s, value);					
+		}	
+		//System.out.println(dictionary.toString());
+	}
+	
+	public static String[] StringToArray(String d1)
+	{
+		String[] stringArray;
+		StringTokenizer st = new StringTokenizer(d1);
+		stringArray = new String[st.countTokens()];
+		int i = 0; 
+		while(st.hasMoreTokens())
+		{
+			String token = st.nextToken();
+			stringArray[i] = token;
+			//System.out.println(token);
+			i++;
+		}
+		//System.out.println(Arrays.toString(stringArray));
+		return stringArray;
+	}
+
+	
+	public static double[] getStringValue(String[] array)
+	{
+		double[] stringValue = new double[array.length];
+		//System.out.println(array.length);
+		for(int i = 0; i < array.length; i++)
+		{
+			//System.out.println(array[i]);
+			stringValue[i] = dictionary.get(array[i]);
+			
+		}
+		//System.out.println(Arrays.toString(stringValue));
+		return stringValue;
+	}
+
+	
+	//method calculates the cosine difference of query and text
+	public static double calculateCosineDifference(String[] textArray, String[] queryArray, double[] valueArray, double[] valueQueryArray)
+	{
+	double dotProduct = 0.0; 
+	double magnitudeA = 0.0;
+	double magnitudeB = 0.0;
+	
+	for(int i = 0; i < textArray.length; i++)
+	{
+		for(int k = 0; k <  queryArray.length; k++)
+		{
+			if(textArray[i].contains(queryArray[k]))
+			{
+				System.out.println(queryArray[k]);				
+				//System.out.println("dictionary value = " + valueArray[i]);
+				//System.out.println("Query value = " + valueQueryArray[k]);
+				dotProduct += (valueArray[i]*valueQueryArray[k]);
+				//System.out.println("dotProduct = " + dotProduct);
+				magnitudeA += Math.sqrt(valueArray[i]);
+				//System.out.println("magnitudeA = " + magnitudeA);
+				magnitudeB += Math.sqrt(valueQueryArray[k]);	
+				//System.out.printf("magnitudeB = %.2f" , magnitudeB);
+				System.out.println();				
+			}
+		}
+	}
+	double formulaResult = dotProduct/(magnitudeA*magnitudeB);
+	//System.out.printf("formula = %.2f" , formulaResult);
+	formulaResult = Math.cos(formulaResult);
+	System.out.println(formulaResult);
+	return formulaResult;
+	}
+}
